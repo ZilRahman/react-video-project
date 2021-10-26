@@ -1,40 +1,56 @@
 import React from "react";
 import SearchBar from "./SearchBar";
-import youtube from '../apis/youtube'
+import youtube from "../apis/youtube";
 import VideoList from "./VideoList";
 import VideoDetail from "./VideoDetail";
 
 class App extends React.Component {
-    state = {videos : [], 
-    selectedVideo: null
+  state = { videos: [], selectedVideo: null };
 
-};
+  // lifecycle method to show a default browser as soon as app is rendered
+  componentDidMount() {
+    this.onTermSubmit("hello world");
+  }
 
-    // call back method from SearchBar prop that communiates search term to youtube api
-    onTermSubmit = async term => {
-        const response = await youtube.get('/search', {
-            params : {
-                q: term
-            }
-        }) 
-        this.setState({videos : response.data.items});
-    };
+  // call back method from SearchBar prop that communiates search term to youtube api
+  onTermSubmit = async (term) => {
+    const response = await youtube.get("/search", {
+      params: {
+        q: term,
+      },
+    });
+    this.setState({
+      videos: response.data.items,
+      selectedVideo: response.data.items[0],
+    });
+  };
 
-    // call back method to display selected video from videoList.js
-    onVideoSelect = (video) => {
-        this.setState({selectedVideo : video})
-    }
-    
-    render () {
-        return (
-        <div className="ui container">
-            <SearchBar onFormSubmit={this.onTermSubmit} />
-            <VideoDetail video={this.state.selectedVideo} />
-            <VideoList videos={this.state.videos} onVideoSelect={this.onVideoSelect}/>
+  // call back method to display selected video from videoList.js
+  onVideoSelect = (video) => {
+    this.setState({ selectedVideo: video });
+  };
+
+  render() {
+    return (
+      <div className="ui container">
+        <SearchBar onFormSubmit={this.onTermSubmit} />
+        <div className="ui grid">
+          <div className="ui row">
+            <div className="eleven wide column">
+              <VideoDetail video={this.state.selectedVideo} />
+            </div>
+
+            <div className="five wide column">
+              <VideoList
+                videos={this.state.videos}
+                onVideoSelect={this.onVideoSelect}
+              />
+            </div>
+          </div>
         </div>
-
-        )
-    }
+      </div>
+    );
+  }
 }
 
 export default App;
